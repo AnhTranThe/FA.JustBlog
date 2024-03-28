@@ -1,0 +1,163 @@
+﻿@using FA.JustBlog.Models.Post
+@model PostViewModel
+@{
+    ViewData["Title"] = "Detail Post";
+    Layout = "_Layout";
+
+}
+<div class="row">
+    <div class="col-lg-8">
+        <div class="bg-white p-4">
+            <h1 class="h4 mb-4">@Model.Title</h1>
+            <div class="tags">
+
+                @if (Model.Tags != null)
+                {
+                    @foreach (var tag in Model.Tags)
+                    {
+                        <a href="/posts/tag/@tag.Id" class="badge bg-primary mb-2 fw-bold">@tag.Name</a>
+                    }
+
+                }
+            </div>
+
+            @if (Model.Image!=null && @Model.Image.Length == 0)
+            {
+                
+
+                <img class="border-radius-15" src="~/img/posts/slogan.png" alt="@Model.ImageAlt" style="width:368px;height:309px;" />
+            }
+            else
+            {
+                <img class="border-radius-15 img-fluid" src="@string.Format("data:image/gif;base64,{0}", Model.Image)" alt="@Model.ImageAlt" />
+            }
+
+            
+            <ul class="list-inline my-3">
+                <li class="list-inline-item"><i class="bi bi-calendar-check"></i><span> @Model.CreateAt</span></li>
+                <li class="list-inline-item"><i class="bi bi-person-circle"></i><a href="/profile/@Model.User.UserName"> @Model.User.UserName</a></li>
+            </ul>
+            <hr >
+           
+            <div class="mt-4">@Html.Raw(@Model.Content)</div>
+
+            <div class="bg-white mt-3">
+                <div class="card border-0">
+                    <div class="card-header pb-0">
+                        <h4><span id="commentCount">@Model.Comments.Count()</span> comments</h4>
+                    </div>
+                    <div class="card-body">
+                        <div id="comments">
+                            @foreach (var comment in Model.Comments)
+                            {
+                                <div class="my-4 d-flex">
+                                    @if (Model.User.Image != null && @Model.User.Image.Length == 0)
+                                    {
+
+                                        <img class="rounded-circle float-start me-3" src="~/img/user/avt_1.jpg" alt="@Model.ImageAlt" style="width:7%;height:7%;" class="rounded-circle float-start me-3" />
+                                    }
+                                    else
+                                    {
+                                        <img class="rounded-circle float-start me-3" src="@string.Format("data:image/gif;base64,{0}", Model.User.Image )" />
+                                    }
+
+
+
+                                
+                                    <div>
+                                        <div class="mb-2 d-flex">
+                                            <h6 class="me-2"><a href="/profile/@comment.User.Email">@comment.User.Email</a></h6>
+                                             <small>@comment.CreateAt</small>
+                                            
+                                            
+                                        </div>
+                                        <p>@comment.Text</p>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+
+                        @if (User.Identity!.IsAuthenticated)
+                        {
+                            <hr class="my-4">
+                            <div>
+                                <h4 class="mb-3">Add Comment</h4>
+                                <form action="/posts/AddComment" method="post">
+                                    <input type="hidden" id="PostId" name="PostId" value="@Model.Id">
+                                    <div class="mb-3">
+                                        <label for="Text" class="form-label">Comment</label>
+                                        <textarea type="text" name="Text" id="Text" class="form-control" rows="3"></textarea>
+                                    </div>
+                                    <div class="mb-3">
+                                        <button type="submit" id="btnSaveComment" class="btn btn-primary">Save</button>
+                                    </div>
+                                </form>
+                            </div>
+                        }
+                        else
+                        {
+                            <p>You must login to make a comment!<a href="/user/login"> Login</a></p>
+                        }
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        </div>
+    <div class="col-lg-4">
+        @await Component.InvokeAsync("NewPosts")
+        @await Component.InvokeAsync("TagsMenu")
+    </div>
+</div>
+
+
+
+
+
+@section Scripts {
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+            $('#btnSaveComment').click(function () {
+                $.ajax({
+                    type: 'POST',
+                    url: '@Url.Action("AddComment")',
+                    dataType: 'json',
+                    data: {
+                        PostId: $('#PostId').val(),
+                        Email: $('#UserName').val(),
+                        Text: $('#Text').val()
+                    },
+                    success: function (comment) {
+
+                        var date = new Date(comment.publishedOn);
+
+                        $("#comments").append(`
+                                    <div class="my-4 d-flex">
+                                        <img src="/img/${comment.avatar}" alt="" class="avatar rounded-circle float-start me-3">
+                                        <div>
+                                            <div class="mb-2 d-flex">
+                                                <h6 class="me-2">${comment.}</h6>
+                                                <small>${date.toLocaleDateString()}</small>
+                                            </div>
+                                                <p>${comment.text}</p>
+                                        </div>
+                                    </div>`);
+
+                        $("#UserName").val('');
+                        $('#Text').val('');
+
+                        var count = parseInt($('#commentCount').text());
+                        $('#commentCount').text(count + 1);
+                    }
+                });
+                return false;
+            })
+
+
+        });
+    </script>
+}
+

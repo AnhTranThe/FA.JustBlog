@@ -1,0 +1,128 @@
+﻿@using FA.JustBlog.Models.Post;
+@using FA.JustBlog.Models.Category;
+@using FA.JustBlog.Models.Tag;
+@model CreatePostViewModel ;
+@{
+    ViewData["Title"] = "Create Post";
+    Layout = "_Layout";
+
+}
+
+<div class="row">
+    <div class="col-12">
+        <div class="bg-white p-4">
+            <h1>Create Post</h1>
+            <form action="Create" method="post" enctype="multipart/form-data">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="mb-3">
+                    <label asp-for="Title" class="form-label"></label>
+                    <input asp-for="Title" class="form-control">
+                    <span asp-validation-for="Title" class="text-danger"></span>
+                </div>
+                <div class="mb-3">
+                    <label asp-for="Content" class="form-label"></label>
+                    <textarea asp-for="Content" class="form-control"></textarea>
+                    <span asp-validation-for="Content" class="text-danger"></span>
+                </div>
+                <div class="mb-3">
+                    <label asp-for="IsActive" class="control-label"></label>
+                    <div class="form-check">
+                        <input asp-for="IsActive" class="form-check-input" />
+                        <label class="form-check-label" asp-for="IsActive">Active</label>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label asp-for="CategoryId" class="control-label"></label>
+                    <select asp-for="CategoryId" class="form-control"
+                            asp-items="@(new SelectList(Model.categoryViewModels, nameof(CategoryViewModel.Id), nameof(CategoryViewModel.Name)))">
+                        
+                        <option value="">-- Select Category --</option>
+                    </select>
+                    <span asp-validation-for="CategoryId" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="TagIds" class="control-label"></label>
+                    <select multiple="multiple" id="TagListBox" asp-for="TagIds" class="form-control "
+                            asp-items="@(new SelectList(Model.tagViewModels, nameof(TagViewModel.Id), nameof(TagViewModel.Name)))">
+
+                        <option value="">-- Select Tag list --</option>
+                    </select>
+                   
+                    
+                    <span asp-validation-for="TagIds" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <div class="card mb-4 mb-xl-0">
+                        <div class="card-header">Hình Cover</div>
+                        <div class="card-body text-center">
+                            <!-- Profile picture image-->
+                            <img id="CoverPic" style="object-fit:contain;width:250px;height:250px " class="mb-2 " src="https://upload.wikimedia.org/wikipedia/commons/a/ac/No_image_available.svg">
+                            <!-- Profile picture help block-->
+                            <div class="small font-italic text-muted mb-4">JPG or PNG no larger than 5 MB</div>
+                            <!-- Profile picture upload button-->
+                            <div style=" border:1px solid #6d6767 ;  padding: 20px; border-radius: 20px;">
+                                <input asp-for="File" type="file" class="form-control-file"
+                                       onchange="document.getElementById('CoverPic').src = window.URL.createObjectURL(this.files[0])" />
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="mb-3">
+                  
+                </div>
+
+                <div class="mb-3">
+                    <button type="submit" class="btn btn-primary">Create</button>
+                    <a href="/posts/list/@Model.ReturnUrl" class="btn btn-danger">Cancel</a>
+                    </div>
+               
+             
+            </form>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    
+    <script>
+        var PageHtmlDom = {
+
+            initControls: function () {
+
+                this.handleDefaultValue();
+                this.handleActionEvent();
+            },
+            handleActionEvent: function () {
+
+
+            },
+            handleDefaultValue: function () {
+                tinymce.init({
+                    selector: '#Content'
+                });
+                $("#TagListBox").select2({
+                    placeholder: "Select a tag.."
+                });
+
+              
+
+            },
+
+        }
+
+        $(document).ready(function () {
+            PageHtmlDom.initControls();
+        });
+
+    </script>
+}
+
+
+
+

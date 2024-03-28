@@ -1,0 +1,96 @@
+﻿@using FA.JustBlog.Models.Post;
+@using FA.JustBlog.Models.Category;
+@using FA.JustBlog.Models.Tag;
+@using FA.JustBlog.Common;
+@model EditPostViewModel ;
+@{
+    ViewData["Title"] = "Edit Post";
+    Layout = "_Layout";
+
+}
+
+<div class="row">
+    <div class="col-12">
+        <div class="bg-white p-4">
+            <h1>Edit Post</h1>
+            <form action="Edit" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <input type="hidden" asp-for="PostId">
+                <div class="mb-3">
+                    <label asp-for="Title" class="form-label"></label>
+                    <input asp-for="Title" class="form-control">
+                    <span asp-validation-for="Title" class="text-danger"></span>
+                </div>
+                <div class="mb-3">
+                    <label asp-for="Content" class="form-label"></label>
+                    <input asp-for="Content" class="form-control">
+                    <span asp-validation-for="Content" class="text-danger"></span>
+                </div>
+              
+                <div class="mb-3">
+                    <label asp-for="Slug" class="form-label"></label>
+                    <input asp-for="Slug" class="form-control">
+                    <span asp-validation-for="Slug" class="text-danger"></span>
+                </div>
+
+                @if (User.FindFirstValue(ClaimTypes.Role) == ConstantSystem.RoleAdminName )
+                {
+                    <div class="form-check mb-3">
+                        <input asp-for="IsActive" class="form-check-input">
+                        <label asp-for="IsActive" class="form-check-label"></label>
+                    </div>
+                }
+
+
+
+
+                <div class="mb-3">
+                    <label asp-for="CategoryId" class="control-label"></label>
+
+                    <select id="CategoryId" asp-for="CategoryId" class="form-control">
+                        <option value="">-- Select Category --</option>
+
+                        @foreach (var category in Model.categoryViewModels)
+                        {
+                            var selectedValue = category.Id == Model.CategoryId ? "selected" : ""; // Check if the category's ID matches the Model's CategoryId
+                            <option value="@category.Id" selected="@selectedValue">@category.Name</option> <!-- Use the selectedValue variable to set the selected attribute -->
+                        }
+                    </select>
+                    <span asp-validation-for="CategoryId" class="text-danger"></span>
+                </div>
+
+
+
+                <div class="mb-3">
+                    <label asp-for="TagIds" class="control-label"></label>
+                    <select multiple="multiple" id="TagListBox" asp-for="TagIds" class="form-control "
+                            asp-items="@(new SelectList(Model.tagViewModels, nameof(TagViewModel.Id), nameof(TagViewModel.Name)))">
+
+                        <option value="">-- Select Tag list --</option>
+                    </select>
+                   
+                    
+                    <span asp-validation-for="TagIds" class="text-danger"></span>
+                </div>
+
+
+
+             
+
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/6.8.2/tinymce.min.js"
+            integrity="sha512-6JR4bbn8rCKvrkdoTJd/VFyXAN4CE9XMtgykPWgKiHjou56YDJxWsi90hAeMTYxNwUnKSQu9JPc3SQUg+aGCHw=="
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <script>
+        tinymce.init({
+            selector: '#Content'
+        });
+    </script>
+}

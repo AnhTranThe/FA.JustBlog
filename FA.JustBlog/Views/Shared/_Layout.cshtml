@@ -1,0 +1,63 @@
+﻿@{
+    string? userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - FA.JustBlog</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/lib/bootstrap-icons/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/style.css" asp-append-version="true" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.7/css/select2.min.css" rel="stylesheet" />
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg bg-white shadow-sm">
+        <div class="container">
+            <a href="/posts" class="navbar-brand">
+                <i class="bi bi-code"></i> BlogApp
+            </a>
+
+            <ul class="navbar-nav ms-auto">
+                @if (User.Identity!.IsAuthenticated)
+                {
+                    <li class="nav-item">
+                        <a href="/profile/@User.Identity.Name" class="nav-link">Hello @User.Identity.Name !</a>
+                    </li>
+                    <li class="nav-item">
+                        <a asp-controller="Posts" asp-action="List" asp-route-UserId="@userId" class="nav-link" title="Posts">Posts</a>
+
+                    </li>
+                    <li class="nav-item">
+                        <a href="/user/logout" class="nav-link">Logout</a>
+                    </li>
+                }
+
+                else
+                {
+                    <li class="nav-item">
+                        <a href="/user/login" class="nav-link">Login</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/user/register" class="nav-link">Register</a>
+                    </li>
+                }
+            </ul>
+        </div>
+    </nav>
+    <div class="container mt-3">
+        @RenderBody()
+    </div>
+
+    <script type="text/javascript" src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.7/js/select2.min.js"></script>
+    <script type="text/javascript" src="~/lib/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/6.8.2/tinymce.min.js"
+            integrity="sha512-6JR4bbn8rCKvrkdoTJd/VFyXAN4CE9XMtgykPWgKiHjou56YDJxWsi90hAeMTYxNwUnKSQu9JPc3SQUg+aGCHw=="
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

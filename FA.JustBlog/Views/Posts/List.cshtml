@@ -1,0 +1,55 @@
+﻿@using FA.JustBlog.Models.Post
+@model PostListViewModel
+@{
+    string? userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+}
+<div class="row">
+    <div class="col-12">
+        <h2>Posts List</h2>
+        <a asp-controller="Posts" asp-action="create" asp-route-returnUrl="@userId" class="btn btn-primary"> New Post</a>
+        
+        <table class="table table-bordered mt-3">
+            <thead>
+                <tr>
+                    <th >Id</th>
+                    <th style="width: 200px;">Image</th>
+                    <th>Title</th>
+                    <th>Content</th>
+                    <th class="text-nowrap">Is Active</th>
+                    <th style="width: 125px;"></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach(var item in Model.Posts){
+                    <tr>
+                        <td class="text-nowrap">@item.Id</td>
+                        <td>
+
+                            @if (@item.Image is null)
+                            {
+
+                                <img class="border-radius-15" src="~/img/posts/slogan.png" alt="@item.ImageAlt" style="width:368px;height:309px;" />
+                            }
+                            else
+                            {
+
+                                <img class="border-radius-15 img-fluid" src="@string.Format("data:image/png;base64,{0}", item.Image)" alt="@item.ImageAlt" />
+                            }
+
+                        </td>
+                       
+                        <td>@item.Title</td>
+                        <td>@Html.Raw(@item.Content) </td>
+                        <td>@item.IsActive</td>
+                       
+                        <td class="d-flex gap-2">
+                            <a asp-controller="Posts" asp-action="edit" asp-route-PostId="@item.Id" class="btn btn btn-sm btn-warning">Update</a>
+                            <a asp-controller="Posts" asp-action="delete" asp-route-PostId="@item.Id" class="btn btn btn-sm btn-danger">Delete</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
