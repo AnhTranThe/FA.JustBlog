@@ -19,16 +19,18 @@ namespace FA.JustBlog.Controllers
         private readonly ITagRepository _tagRepository;
         private readonly ICategoryRepository _categoryRepository;
         private readonly IUserRepository _userRepository;
+        private readonly ILoggingRepository _logging;
         private readonly IMapper _mapper;
 
 
-        public PostsController(IPostRepository postRepository, ITagRepository tagRepository, IUserRepository userRepository, ICategoryRepository categoryRepository, IMapper mapper)
+        public PostsController(IPostRepository postRepository, ITagRepository tagRepository, IUserRepository userRepository, ICategoryRepository categoryRepository, IMapper mapper, ILoggingRepository logging)
         {
             _postRepository = postRepository;
             _tagRepository = tagRepository;
             _userRepository = userRepository;
             _categoryRepository = categoryRepository;
             _mapper = mapper;
+            _logging = logging;
         }
 
 
@@ -131,7 +133,7 @@ namespace FA.JustBlog.Controllers
 
 
         [HttpPost]
-        public IActionResult Create(CreatePostViewModel model)
+        public async Task<IActionResult> Create(CreatePostViewModel model)
         {
             if (ModelState.IsValid)
             {
@@ -142,24 +144,34 @@ namespace FA.JustBlog.Controllers
                     fileBytes = CommonUtils.ConvertFileToByteArray(model.File);
 
                 }
-                _ = _postRepository.CreatePostAsync(
-                    new CreatePostViewModel
-                    {
-                        Title = model.Title,
-                        Content = model.Content,
-                        Slug = CommonUtils.UrlFriendly(model.Title ?? ""),
-                        UserId = userId ?? "",
-                        Image = fileBytes,
-                        IsActive = model.IsActive,
-                        CategoryId = model.CategoryId,
-                        TagIds = model.TagIds
-                    }
-                );
+                await _postRepository.CreatePostAsync(
+                   new CreatePostViewModel
+                   {
+                       Title = model.Title,
+                       Content = model.Content,
+                       Slug = CommonUtils.UrlFriendly(model.Title ?? ""),
+                       UserId = userId ?? "",
+                       Image = fileBytes,
+                       IsActive = model.IsActive,
+                       CategoryId = model.CategoryId,
+                       TagIds = model.TagIds
+                   }
+               );
 
                 return RedirectToAction("Index");
             }
 
-            return View();
+            List<Category> categoryLs = await _categoryRepository.Categories.ToListAsync(); ;
+            List<Tag> tagLs = await _tagRepository.Tags.ToListAsync();
+
+            CreatePostViewModel createPostViewModel = new()
+            {
+                categoryViewModels = _mapper.Map<List<CategoryViewModel>>(categoryLs),
+                tagViewModels = _mapper.Map<List<TagViewModel>>(tagLs)
+            };
+            ;
+
+            return View(createPostViewModel);
         }
 
         [HttpGet]
@@ -184,6 +196,106 @@ namespace FA.JustBlog.Controllers
                 ? NotFound()
                 : View(postViewModel);
         }
+
+        [HttpPost]
+        [Authorize(Roles = ConstantSystem.RoleUserName + "," + ConstantSystem.RoleAdminName)]
+        public async Task<IActionResult> Edit(EditPostViewModel model, IFormFile? ImageFile)
+        {
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    if (ImageFile != null && ImageFile.Length > 0)
+                    {
+                        // Read the image data from the uploaded file
+                        model.Image = CommonUtils.ConvertFileToByteArray(ImageFile);
+                    }
+
+                    string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+                    // Update the post using the repository method
+                    await _postRepository.EditPostAsync(model, userId ?? "");
+
+                    // Redirect to a success page or return a success response
+                    return RedirectToAction("Index");
+                }
+                catch (Exception ex)
+                {
+                    // Log the error
+                    _logging.LogError(ex);
+                    List<Category> categoryLs = await _categoryRepository.Categories.ToListAsync(); ;
+                    List<Tag> tagLs = await _tagRepository.Tags.ToListAsync();
+                    model.categoryViewModels = _mapper.Map<List<CategoryViewModel>>(categoryLs);
+                    model.tagViewModels = _mapper.Map<List<TagViewModel>>(tagLs);
+                    ViewData["ErrorMessage"] = ex.Message;
+
+
+                    return View(model);
+
+                    // Return an error view or a generic error message
+
+                }
+            }
+            else
+            {
+                List<Category> categoryLs = await _categoryRepository.Categories.ToListAsync(); ;
+                List<Tag> tagLs = await _tagRepository.Tags.ToListAsync();
+                model.categoryViewModels = _mapper.Map<List<CategoryViewModel>>(categoryLs);
+                model.tagViewModels = _mapper.Map<List<TagViewModel>>(tagLs);
+                ViewData["ErrorMessage"] = "Model validation failed. Please correct the errors and try again.";
+
+                // If model validation fails, return the view with validation errors
+                return View(model);
+            }
+
+        }
+
+
+        [HttpPost, ActionName("DeletePermanently")]
+        [Authorize(Roles = ConstantSystem.RoleAdminName)]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeletePermanently(string PostId)
+        {
+            try
+            {
+                // Check if postId is valid
+                if (string.IsNullOrEmpty(PostId))
+                {
+                    return BadRequest("Invalid post ID");
+                }
+
+                // Find the post in the database by PostId
+                Post? postToDelete = await _postRepository.FindAsync(PostId);
+
+
+                // Check if the post exists
+                if (postToDelete == null)
+                {
+                    return NotFound("Post not found");
+                }
+
+                // Remove the post from the database
+
+
+                _ = await _postRepository.DeleteAsync(postToDelete.Id);
+
+                string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                return RedirectToAction("list", new { UserId = userId });
+
+            }
+            catch (Exception ex)
+            {
+                // Log the exception
+                _logging.LogError(ex);
+
+                // Optionally, return an error view or message
+                return StatusCode(500, "An error occurred while deleting the post");
+            }
+
+
+        }
+
     }
 }
 

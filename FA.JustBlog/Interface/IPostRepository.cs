@@ -8,7 +8,7 @@ namespace FA.JustBlog.Interface
         IQueryable<Post> Posts { get; }
         IQueryable<MapPostTag> mapPostTags { get; }
         Task CreatePostAsync(CreatePostViewModel post);
-        Task EditPostAsync(EditPostViewModel post);
+        Task EditPostAsync(EditPostViewModel post, string UserId);
         Task<Post?> FindAsync(string id);
         Task<bool> DeleteAsync(string id);
 

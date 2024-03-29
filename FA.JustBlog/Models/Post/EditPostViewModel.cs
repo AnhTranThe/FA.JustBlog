@@ -19,7 +19,7 @@ namespace FA.JustBlog.Models.Post
 
         public bool IsActive { get; set; }
 
-        public IFormFile? File { get; set; }
+
 
         public byte[]? Image { get; set; }
 

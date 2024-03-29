@@ -24,17 +24,19 @@
                 @foreach(var item in Model.Posts){
                     <tr>
                         <td class="text-nowrap">@item.Id</td>
-                        <td>
-
-                            @if (@item.Image is null)
+                        <td class="text-xl-center">
+                           
+                            @if (@item.Image != null && @item.Image.Length > 0)
                             {
-
-                                <img class="border-radius-15" src="~/img/posts/slogan.png" alt="@item.ImageAlt" style="width:368px;height:309px;" />
+                                string imageBase64 = Convert.ToBase64String(@item.Image);
+                                string imageSrc = $"data:image/jpeg;base64,{imageBase64}";
+                                <img src="@imageSrc" alt="Image" style="object-fit:contain;width:250px;height:250px" />
                             }
+                           
                             else
                             {
+                                <img class="border-radius-15" src="~/img/posts/slogan.png" alt="@item.ImageAlt" style="object-fit:contain;width:250px;height:250px" />
 
-                                <img class="border-radius-15 img-fluid" src="@string.Format("data:image/png;base64,{0}", item.Image)" alt="@item.ImageAlt" />
                             }
 
                         </td>
@@ -45,7 +47,8 @@
                        
                         <td class="d-flex gap-2">
                             <a asp-controller="Posts" asp-action="edit" asp-route-PostId="@item.Id" class="btn btn btn-sm btn-warning">Update</a>
-                            <a asp-controller="Posts" asp-action="delete" asp-route-PostId="@item.Id" class="btn btn btn-sm btn-danger">Delete</a>
+                            <a href="#" data-Id="@item.Id" data-postTitle="@item.Title" class="preventDeletePopUp btn btn-sm btn-danger">Delete</a>
+
                         </td>
                     </tr>
                 }
@@ -53,3 +56,80 @@
         </table>
     </div>
 </div>
+<form id="deletePermanent" asp-action="DeletePermanently">
+    <input type="hidden" id="deletePermanentId" name="PostId" />
+</form>
+
+@section Scripts {
+
+    <script>
+        var PageHtmlDom = {
+
+            initControls: function () {
+
+                this.handleDefaultValue();
+                this.handleActionEvent();
+            },
+            handleActionEvent: function () {
+
+                $('.preventDeletePopUp').click((e) => {
+                   // e.preventDefault(); // Prevent the default behavior of the link
+                    var id = $(e.currentTarget).data("id"); // Retrieve the data-ItemPostId attribute from the clicked element
+                    var title = $(e.currentTarget).data("posttitle");
+                    
+                 
+                    Swal.fire({
+                        title: `Are you sure? ${title}`,
+                        text: "You won't be able to revert this!",
+                        icon: "warning",
+                        showCancelButton: true,
+                        confirmButtonColor: "#3085d6",
+                        cancelButtonColor: "#d33",
+                        confirmButtonText: "Yes, delete it!"
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            $('#deletePermanentId').val(id);
+                            $('#deletePermanent').submit();
+                            Swal.fire({
+                              
+                                title: "Deleted!",
+                                text: "Your file has been deleted.",
+                                icon: "success"
+                            });
+                        }
+                    });
+
+
+
+
+                    // Swal.fire({
+                    //     title: "Bạn chắc chắn?",
+                    //     text: "Bạn chắc chắn muốn xóa vĩnh viễn danh mục này, thao tác không hoàn lại?",
+                    //     icon: "warning",
+                    //     buttons: true,
+                    //     dangerMode: true
+                    // }).then((confirm) => {
+                    //     if (confirm) {
+                    //         var btn = $(this);
+                    //         var id = btn.data("id");
+                    //         $('#deletePermanentId').val(id);
+                    //         $('#deletePermanent').submit();
+                    //     }
+                    // });
+                });
+
+            },
+            handleDefaultValue: function () {
+
+               
+            },
+
+        }
+
+        $(document).ready(function () {
+            PageHtmlDom.initControls();
+        });
+
+
+    </script>
+}

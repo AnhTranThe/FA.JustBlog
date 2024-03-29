@@ -101,13 +101,7 @@ namespace FA.JustBlog
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
-                using (IServiceScope scope = app.Services.CreateScope())
-                {
-                    IServiceProvider services = scope.ServiceProvider;
-                    SeedData.Initialize(services);
-
-                }
-
+                // SeedData.Initialize(app);
                 _ = app.UseMigrationsEndPoint();
             }
             else

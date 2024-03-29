@@ -32,8 +32,6 @@ namespace FA.JustBlog.Data
         }
         public virtual async Task<int> SaveChangesAsync(string userId = "")
         {
-
-
             foreach (Microsoft.EntityFrameworkCore.ChangeTracking.EntityEntry<BaseEntity> entry in ChangeTracker.Entries<BaseEntity>())
             {
 
@@ -49,20 +47,9 @@ namespace FA.JustBlog.Data
                     entry.Entity.Createby = userId;
                 }
             }
-            int result = await base.SaveChangesAsync();
-            // Detach tracked entities if userId is provided
-            //if (!string.IsNullOrEmpty(userId))
-            //{
-            //    foreach (Microsoft.EntityFrameworkCore.ChangeTracking.EntityEntry<BaseEntity> entry in ChangeTracker.Entries<BaseEntity>())
-            //    {
-            //        if (entry.Entity.Createby == userId || entry.Entity.Updateby == userId)
-            //        {
-            //            entry.State = EntityState.Detached;
-            //        }
-            //    }
-            //}
-            return result;
 
+
+            return await base.SaveChangesAsync();
 
         }
         public DbSet<Post> Posts { get; set; }

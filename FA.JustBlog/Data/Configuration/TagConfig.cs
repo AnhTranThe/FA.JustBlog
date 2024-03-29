@@ -14,8 +14,6 @@ namespace FA.JustBlog.Data.Configuration
             _ = builder.ToTable("Tags");
 
 
-
-
         }
 
     }

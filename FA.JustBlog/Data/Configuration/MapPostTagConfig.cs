@@ -13,8 +13,8 @@ namespace FA.JustBlog.Data.Configuration
         {
             _ = builder.ToTable("MapPostTags");
             _ = builder.HasKey(x => new { x.PostId, x.TagId });
-            _ = builder.HasOne(x => x.Post).WithMany(x => x.mapPostTags).HasForeignKey(x => x.PostId).OnDelete(DeleteBehavior.NoAction);
-            _ = builder.HasOne(x => x.Tag).WithMany(x => x.mapPostTags).HasForeignKey(x => x.TagId).OnDelete(DeleteBehavior.NoAction);
+            _ = builder.HasOne(x => x.Post).WithMany(x => x.mapPostTags).HasForeignKey(x => x.PostId).OnDelete(DeleteBehavior.ClientSetNull);
+            _ = builder.HasOne(x => x.Tag).WithMany(x => x.mapPostTags).HasForeignKey(x => x.TagId).OnDelete(DeleteBehavior.ClientSetNull);
 
 
 

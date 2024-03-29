@@ -13,7 +13,13 @@
     <div class="col-12">
         <div class="bg-white p-4">
             <h1>Edit Post</h1>
-            <form action="Edit" method="post">
+            @if (ViewData["ErrorMessage"] != null)
+            {
+                <div class="alert alert-danger">
+                    @ViewData["ErrorMessage"]
+                </div>
+            }
+            <form action="Edit" method="post" enctype="multipart/form-data">
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                 <input type="hidden" asp-for="PostId">
                 <div class="mb-3">
@@ -41,23 +47,19 @@
                     </div>
                 }
 
-
-
-
                 <div class="mb-3">
                     <label asp-for="CategoryId" class="control-label"></label>
+                    <select asp-for="CategoryId" class="form-control"
+                            asp-items="@(new SelectList(Model.categoryViewModels, nameof(TagViewModel.Id), nameof(TagViewModel.Name)))">
 
-                    <select id="CategoryId" asp-for="CategoryId" class="form-control">
                         <option value="">-- Select Category --</option>
-
-                        @foreach (var category in Model.categoryViewModels)
-                        {
-                            var selectedValue = category.Id == Model.CategoryId ? "selected" : ""; // Check if the category's ID matches the Model's CategoryId
-                            <option value="@category.Id" selected="@selectedValue">@category.Name</option> <!-- Use the selectedValue variable to set the selected attribute -->
-                        }
                     </select>
+                   
+                    
                     <span asp-validation-for="CategoryId" class="text-danger"></span>
                 </div>
+
+
 
 
 
@@ -75,7 +77,40 @@
 
 
 
-             
+              
+
+
+                <div class="mb-3">
+                    <div class="card mb-4 mb-xl-0">
+                        <div class="card-header">Hình Cover</div>
+                        <div class="card-body text-center">
+                            @if (Model.Image != null && Model.Image.Length > 0)
+                            {
+                                string imageBase64 = Convert.ToBase64String(Model.Image);
+                                string imageSrc = $"data:image/jpeg;base64,{imageBase64}";
+                                <img id="CoverPic" src="@imageSrc" alt="Image" style="object-fit:contain;width:250px;height:250px " />
+                            }
+                            else
+                            {
+                                <img id="CoverPic" style="object-fit:contain;width:250px;height:250px " class="mb-2 " src="https://upload.wikimedia.org/wikipedia/commons/a/ac/No_image_available.svg">
+
+                            }
+
+                            <!-- Profile picture image-->
+                            <!-- Profile picture help block-->
+                            <div class="small font-italic text-muted mb-4">JPG or PNG no larger than 5 MB</div>
+                            <!-- Profile picture upload button-->
+                            <div style=" border:1px solid #6d6767 ;  padding: 20px; border-radius: 20px;">
+                                <input name="ImageFile" type="file" class="form-control-file"
+                                       onchange="document.getElementById('CoverPic').src = window.URL.createObjectURL(this.files[0])" />
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+
+
 
                 <button type="submit" class="btn btn-primary">Save Changes</button>
             </form>
@@ -92,5 +127,8 @@
         tinymce.init({
             selector: '#Content'
         });
+        $('select').select2();
+
+        $('select[multiple]').select2();
     </script>
 }

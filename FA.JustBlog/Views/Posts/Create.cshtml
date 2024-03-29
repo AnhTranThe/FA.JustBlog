@@ -35,11 +35,14 @@
                     <label asp-for="CategoryId" class="control-label"></label>
                     <select asp-for="CategoryId" class="form-control"
                             asp-items="@(new SelectList(Model.categoryViewModels, nameof(CategoryViewModel.Id), nameof(CategoryViewModel.Name)))">
-                        
+
                         <option value="">-- Select Category --</option>
                     </select>
                     <span asp-validation-for="CategoryId" class="text-danger"></span>
                 </div>
+               
+             
+
 
                 <div class="mb-3">
                     <label asp-for="TagIds" class="control-label"></label>

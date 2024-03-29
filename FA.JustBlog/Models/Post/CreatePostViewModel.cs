@@ -23,9 +23,9 @@ namespace FA.JustBlog.Models.Post
         public List<CategoryViewModel> categoryViewModels { get; set; } = new List<CategoryViewModel>();
 
         public List<TagViewModel> tagViewModels { get; set; } = new List<TagViewModel>();
-        [Required]
+        [Required(ErrorMessage = "Please select a category")]
         public string? CategoryId { get; set; }
-        [Required]
+        [Required(ErrorMessage = "Please select a tag or more")]
         public List<string>? TagIds { get; set; }
 
         public string? UserId { get; set; }

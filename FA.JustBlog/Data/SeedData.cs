@@ -1,23 +1,18 @@
 using FA.JustBlog.Common;
 using FA.JustBlog.Entities;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 
 namespace FA.JustBlog.Data
 {
     public static class SeedData
     {
-        public static async void Initialize(IServiceProvider serviceProvider)
+        public static async void Initialize(IHost host)
         {
-            // ApplicationDbContext? context = app.ApplicationServices.CreateScope().ServiceProvider.GetService<ApplicationDbContext>();
-            using ApplicationDbContext context = new(
-                serviceProvider.GetRequiredService<
-                    DbContextOptions<ApplicationDbContext>>());
-
+            using IServiceScope scope = host.Services.CreateScope();
+            IServiceProvider serviceProvider = scope.ServiceProvider;
+            ApplicationDbContext? context = serviceProvider.GetService<ApplicationDbContext>();
             if (context != null)
             {
-
-
                 string rootAdminRoleId = ConstantSystem.AdminRoleId;
 
                 string rootUserRoleId = ConstantSystem.UserRoleId;
@@ -259,12 +254,7 @@ namespace FA.JustBlog.Data
 
             }
 
-
-
-
         }
-
-
 
 
     }

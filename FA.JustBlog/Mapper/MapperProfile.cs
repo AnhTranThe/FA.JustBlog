@@ -24,11 +24,14 @@ namespace FA.JustBlog.Mapper
                 .ForMember(dest => dest.UpdateAt, opt => opt.MapFrom(src => src.UpdateAt.ToString("dd/MM/yyyy")));
 
             _ = CreateMap<Post, EditPostViewModel>()
+              .ForMember(dest => dest.TagIds, opt => opt.MapFrom(src => src.mapPostTags != null ? src.mapPostTags.Select(mpt => mpt.Tag.Id).ToList() : new List<string>()))
+              ;
 
-;
+
 
             _ = CreateMap<EditPostViewModel, Post>()
               .ForMember(dest => dest.Image, opt => opt.MapFrom(src => src.Image != null && src.Image.Length > 0 ? src.Image : null));
+
 
 
             _ = CreateMap<CreatePostViewModel, Post>();

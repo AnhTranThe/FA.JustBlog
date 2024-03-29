@@ -10,15 +10,22 @@
             {
                 <div class="card bg-transparent border-0 mb-3">
                     <div class="row">
-                        @if (@post.Image is null)
-                        {
+                     
 
-                            <img class="border-radius-15" src="~/img/posts/slogan.png" alt="@post.ImageAlt" style="width:368px;height:309px;" />
-                        }
-                        else
-                        {
-                            <img class="border-radius-15" src="@string.Format("data:image/gif;base64,{0}", post.Image)" alt="@post.ImageAlt" style="width:368px;height:309px;" />
-                        }
+                          @if (@post.Image != null && @post.Image.Length > 0)
+                            {
+                            string imageBase64 = Convert.ToBase64String(@post.Image);
+                                string imageSrc = $"data:image/jpeg;base64,{imageBase64}";
+                            <img src="@imageSrc" alt="Image" style="width:368px;height:309px; object-fit:cover" />
+                            }
+                           
+                            else
+                            {
+                            <img class="border-radius-15" src="~/img/posts/slogan.png" alt="@post.ImageAlt" style="width:368px;height:309px; object-fit:cover" />
+
+                            }
+
+
                         <div class="col-8">
 
 

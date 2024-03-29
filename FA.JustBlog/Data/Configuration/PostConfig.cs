@@ -12,8 +12,8 @@ namespace FA.JustBlog.Data.Configuration
         public void Configure(EntityTypeBuilder<Post> builder)
         {
             _ = builder.ToTable("Posts");
-            _ = builder.HasOne(x => x.User).WithMany(x => x.Posts).HasForeignKey(x => x.UserId).OnDelete(DeleteBehavior.NoAction);
-            _ = builder.HasOne(x => x.Category).WithMany(x => x.Posts).HasForeignKey(x => x.CategoryId).OnDelete(DeleteBehavior.NoAction);
+            _ = builder.HasOne(x => x.User).WithMany(x => x.Posts).HasForeignKey(x => x.UserId).OnDelete(DeleteBehavior.ClientSetNull);
+            _ = builder.HasOne(x => x.Category).WithMany(x => x.Posts).HasForeignKey(x => x.CategoryId).OnDelete(DeleteBehavior.ClientSetNull);
 
         }
 
